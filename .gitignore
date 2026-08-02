@@ -1,0 +1,13 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Secrets
+.env
+
+# Data dumps
+*.csv
+*.sql.gz
+data/raw/
