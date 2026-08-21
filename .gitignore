@@ -11,3 +11,4 @@ __pycache__/
 *.csv
 *.sql.gz
 data/raw/
+.DS_Store
