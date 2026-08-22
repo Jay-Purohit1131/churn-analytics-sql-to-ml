@@ -1,5 +1,6 @@
 # Python
 venv/
+.venv/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
@@ -10,5 +11,5 @@ __pycache__/
 # Data dumps
 *.csv
 *.sql.gz
-data/raw/
+data/
 .DS_Store
