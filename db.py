@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 load_dotenv()
 
@@ -12,4 +12,4 @@ engine = create_engine(
 ) 
 
 def run_query(sql):
-    return pd.read_sql(sql, engine)
+    return pd.read_sql(text(sql), engine)

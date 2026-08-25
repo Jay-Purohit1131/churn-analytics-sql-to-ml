@@ -129,6 +129,20 @@ Question: How do customers segment into frequency quintiles?
 
 Because ~97% of customers have exactly one order, NTILE(5) splits the tied one-time buyers across segments 1–4 (all min = max = 1); only segment 5 captures any repeat buyers. Demonstrates that NTILE's equal-count buckets break down on a heavily-skewed variable — recency or monetary dimensions segment far more cleanly.
 
-Status
+## Cohort Retention Analysis
+
+**Question:** Of customers who first purchased in a given month, what percentage
+placed another order N months later?
+
+Customers are grouped into cohorts by their first-order month, then tracked across
+subsequent months. Full SQL in [`queries/04_cohort_retention.sql`](queries/04_cohort_retention.sql);
+the long-format result is pivoted into the matrix below in pandas.
+
+![Cohort retention heatmap](docs/cohort_retention_heatmap.png)
+
+**Finding — retention is a cliff, not a curve.** Retention drops from 100% (signup
+month) to roughly
+
+### Status
 
 In progress. Complete: schema design, data load, exploratory analysis, data dictionary, schema diagram, and 10 documented analytical queries. Next: cohort retention analysis, RFM segmentation, the SQL feature view, and the churn model with write-back.
