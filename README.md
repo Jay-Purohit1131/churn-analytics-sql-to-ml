@@ -176,6 +176,34 @@ marketplace: once recency is correctly excluded, churn is only weakly predictabl
 behavioural features. This reinforces the project's thesis — the value is in the
 analytical SQL and the closed-loop architecture, not the model's raw accuracy.
 
+## Query Optimisation (EXPLAIN ANALYZE)
+
+Index effectiveness depends on **selectivity** — how much of the table a filter
+eliminates. Two cases demonstrate this:
+
+**Selective filter — index helps.** `payment_type = 'voucher'` matches only ~5,775 of
+~104k payment rows. Adding an index on `payment_type` changed the plan from a
+sequential scan to a Bitmap Index Scan:
+
+| | Plan | Execution time |
+|---|---|---|
+| Before | `Seq Scan` (scans all ~104k rows) | 3.22 ms |
+| After (indexed) | `Bitmap Index Scan` | 1.38 ms |
+
+~2.3× faster, and the planner switched to using the index.
+
+**Non-selective filter — index ignored (correctly).** `order_status = 'delivered'`
+matches ~97% of orders (96,478 of 99,441). An index here was **ignored by the
+planner** — a sequential scan is cheaper when nearly every row qualifies, since an
+index only helps by letting the query skip most of the table. The non-useful index
+was dropped.
+
+**Takeaway:** indexes speed up queries that filter to a small subset; they add no
+value (and the planner won't use them) when the filter matches most rows. Absolute
+gains here are small due to table size (~100k rows), but the pattern scales — on
+millions of rows the same plan change is the difference between seconds and
+milliseconds.
+
 ### Status
 
 In progress. Complete: schema design, data load, exploratory analysis, data dictionary, schema diagram, and 10 documented analytical queries. Next: cohort retention analysis, RFM segmentation, the SQL feature view, and the churn model with write-back.
