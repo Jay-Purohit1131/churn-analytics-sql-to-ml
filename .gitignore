@@ -12,4 +12,4 @@ __pycache__/
 *.csv
 *.sql.gz
 data/
-.DS_Store
+.DS_Storemodels/

@@ -143,6 +143,39 @@ the long-format result is pivoted into the matrix below in pandas.
 **Finding — retention is a cliff, not a curve.** Retention drops from 100% (signup
 month) to roughly
 
+## Churn Model
+
+The churn model is kept deliberately modest — per the project's focus, the analytical
+SQL is the core and the model is a demonstration of closing the loop, not a
+high-accuracy predictor.
+
+**Detecting and fixing target leakage.** An initial random forest scored a perfect
+ROC-AUC of 1.0 — a red flag rather than a success. Investigation revealed **target
+leakage**: `recency` was included as a feature, but the churn label is *defined* as
+recency > 180 days, so the model was simply reverse-engineering the labelling rule
+(recency alone accounted for 99% of its feature importance). Removing `recency`
+produced honest results.
+
+**Results (after fixing leakage).** Two models were trained on the SQL `feature_view`
+(spend, order count, tenure, review score), with `class_weight='balanced'` to handle
+the ~71/29 class imbalance and evaluated on a stratified hold-out set:
+
+| Model | ROC-AUC |
+|---|---|
+| Logistic Regression | 0.55 |
+| Random Forest | **0.71** |
+
+Logistic regression found almost no linear signal (0.55, near-random); random forest
+captured non-linear structure and reached a respectable **0.71**. Feature importances
+identify **spend (`avg_spend`, `total_spend`) as the dominant behavioural predictor of
+churn** — consistent with the RFM analysis — while review score, tenure, and order
+count contribute little.
+
+**Interpretation.** The modest AUC is the honest result for a one-time-purchase
+marketplace: once recency is correctly excluded, churn is only weakly predictable from
+behavioural features. This reinforces the project's thesis — the value is in the
+analytical SQL and the closed-loop architecture, not the model's raw accuracy.
+
 ### Status
 
 In progress. Complete: schema design, data load, exploratory analysis, data dictionary, schema diagram, and 10 documented analytical queries. Next: cohort retention analysis, RFM segmentation, the SQL feature view, and the churn model with write-back.
